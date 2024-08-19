@@ -2,3 +2,4 @@
 **/.svelte-kit
 **/*.env
 **/*.zip
+**/*.gdb
