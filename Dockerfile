@@ -1,7 +1,5 @@
 FROM ghcr.io/osgeo/gdal:latest
 
-COPY ./data /data
-
 COPY ./frontend /frontend
 
 RUN echo $(ogrinfo --version)
