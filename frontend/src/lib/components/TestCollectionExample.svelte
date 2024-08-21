@@ -12,45 +12,43 @@
 		);
 		result = { rows: res2.toArray().map((r) => r.toJSON()), fields: res2.schema.fields };
 		loading = false;
+
+        c?.close()
 	});
 </script>
 
-<h2 class="text-3xl font-semibold leading-loose">Data Dictionary</h2>
-{#if loading}
-	<div class="w-full mx-auto text-center">LOADING, PLEASE WAIT...</div>
-{/if}
-<table>
-	{#if result}
-		<tr
-			>{#each result.fields as th}
-				<th>{th.name} ({th.type})</th>
-			{/each}</tr
-		>
-
-		{#each result.rows as tr}
+<section class="w-full mx-auto overflow-x-auto">
+	<h2 class="text-3xl font-semibold leading-loose">Data Dictionary</h2>
+	{#if loading}
+		<div class="w-full mx-auto text-center">LOADING, PLEASE WAIT...</div>
+	{/if}
+	<table class="w-full">
+		{#if result}
 			<tr
-				>{#each Object.values(tr) as val}
-					<td>
-						{val}
-					</td>
+				>{#each result.fields as th}
+					<th>{th.name} ({th.type})</th>
 				{/each}</tr
 			>
-		{/each}
-	{/if}
-</table>
 
-<style>
-	table,
-	tr,
-	td,
-	th {
-		padding: 0.5rem;
-		border: solid 1px #ccc;
-	}
-    table {
-        margin-left: auto;
-        margin-right: auto;
-        max-width: 100%;
-        overflow: auto;
-    }
-</style>
+			{#each result.rows as tr}
+				<tr
+					>{#each Object.values(tr) as val}
+						<td>
+							{val}
+						</td>
+					{/each}</tr
+				>
+			{/each}
+		{/if}
+	</table>
+
+	<style>
+		table,
+		tr,
+		td,
+		th {
+			padding: 0.5rem;
+			border: solid 1px #ccc;
+		}
+	</style>
+</section>
