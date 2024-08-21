@@ -1,4 +1,4 @@
-import { writable } from 'svelte/store';
+import { get, writable } from 'svelte/store';
 
 import * as duckdb from '@duckdb/duckdb-wasm';
 import duckdb_wasm from '@duckdb/duckdb-wasm/dist/duckdb-mvp.wasm?url';
@@ -32,7 +32,9 @@ function createDuckDbInstance() {
 		logger: null,
 		isInstantiated: false
 	};
-	const { subscribe, set, update } = writable(initialState);
+	const store = writable(initialState);
+    const  {subscribe, set, update } = store;
+
     let db : duckdb.AsyncDuckDB;
 	// Select a bundle based on browser checks
 	duckdb.selectBundle(MANUAL_BUNDLES).then((b) => {
@@ -51,10 +53,21 @@ function createDuckDbInstance() {
 		});
 	});
 
+    async function connect(){
+        const instance = get(store);
+        if(instance.isInstantiated){
+            const conn = await instance.db?.connect();
+            return conn
+        } else {
+            throw new Error("Error: DB has not yet been instantiated.")
+        }
+    }
+
     return {
         subscribe,
         set,
-        update
+        update,
+        connect,
     }
 }
 
