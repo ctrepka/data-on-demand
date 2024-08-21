@@ -21,4 +21,6 @@ RUN ogr2ogr /data/stratmap24-addresspoints_48.parquet /data/stratmap24-addresspo
 
 RUN duckdb -c "INSTALL spatial; LOAD spatial; SELECT ST_GeomFromWKB(SHAPE) FROM '/data/stratmap24-addresspoints_48.parquet' LIMIT 24;" >> result.txt
 
+RUN mv /data/stratmap24-addresspoints_48.parquet
+
 EXPOSE 5173
