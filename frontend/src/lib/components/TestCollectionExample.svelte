@@ -14,7 +14,7 @@
 	});
 </script>
 
-<h2>Data Dictionary</h2>
+<h2 class="text-3xl font-semibold leading-loose">Data Dictionary</h2>
 <table>
 	{#if result}
 		<tr
