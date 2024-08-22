@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { duckDbInstance } from '$lib/duckdbInstanceStore';
-	import Result from 'postcss/lib/result';
 
 	let dataDictionary;
 	let queryResult;
@@ -33,15 +32,16 @@
 
 		dlLink = URL.createObjectURL(new Blob([pqBuf]));
 		loading = false;
-
+		//test
 		c?.close();
+		await $duckDbInstance.db?.dropFile('data_preview.csv');
 	});
 </script>
 
 <section class="w-full mx-auto overflow-x-auto">
 	<h2 class="text-3xl font-semibold leading-loose">Data Dictionary</h2>
 	{#if loading}
-		<div class="w-full mx-auto text-center">LOADING, PLEASE WAIT...</div>
+		<div class="w-full mx-auto text-center font-bold">LOADING, PLEASE WAIT...</div>
 	{/if}
 	<div class="max-h-[400px] overflow-auto border-s-gray-100">
 		<table class="w-full">
@@ -66,10 +66,14 @@
 	</div>
 	<h2 class="text-3xl font-semibold leading-loose">Preview Results (limit 100)</h2>
 	{#if dlLink}
-		<a href={dlLink} download="data_preview.csv">Download Preview CSV</a>
+		<a
+			href={dlLink}
+			class="text-blue-600 visited:text-purple-600 font-bold"
+			download="data_preview.csv">Download Preview CSV</a
+		>
 	{/if}
 	{#if loading}
-		<div class="w-full mx-auto text-center">LOADING, PLEASE WAIT...</div>
+		<div class="w-full mx-auto text-center font-bold">LOADING, PLEASE WAIT...</div>
 	{/if}
 	<div class="max-h-[400px] overflow-auto">
 		<table class="w-full">
