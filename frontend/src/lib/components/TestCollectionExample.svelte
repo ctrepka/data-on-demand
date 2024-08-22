@@ -2,18 +2,39 @@
 	import { duckDbInstance } from '$lib/duckdbInstanceStore';
 	import Result from 'postcss/lib/result';
 
-	let result;
+	let dataDictionary;
+	let queryResult;
 	let loading = true;
+	let dlLink = null;
 
 	const conn = duckDbInstance.connect().then(async (c) => {
-		const res = await c?.query('INSTALL spatial; LOAD spatial;');
-		const res2 = await c?.query(
+		const INSTALL_QUERY = await c?.query(
+			'INSTALL spatial; LOAD spatial; INSTALL parquet; LOAD parquet;'
+		);
+		const DATA_DICT = await c?.query(
 			"DESCRIBE SELECT * FROM 's3://txgio-copc-test/stratmap24-addresspoints_48.parquet' LIMIT 1;"
 		);
-		result = { rows: res2.toArray().map((r) => r.toJSON()), fields: res2.schema.fields };
+		const PREVIEW_TABLE = await c?.query(
+			`DROP TABLE IF EXISTS preview; CREATE TABLE preview AS SELECT * FROM 's3://txgio-copc-test/stratmap24-addresspoints_48.parquet' LIMIT 100;`
+		);
+		const PREVIEW_EXPORT = await c?.query(`COPY preview TO 'data_preview.csv' (FORMAT CSV);`);
+		const PREVIEW_QUERY = await c?.query(`SELECT * FROM preview;`);
+
+		queryResult = {
+			rows: PREVIEW_QUERY.toArray().map((r) => r.toJSON()),
+			fields: PREVIEW_QUERY.schema.fields
+		};
+		dataDictionary = {
+			rows: DATA_DICT.toArray().map((r) => r.toJSON()),
+			fields: DATA_DICT.schema.fields
+		};
+
+		const pqBuf = await $duckDbInstance.db.copyFileToBuffer('data_preview.csv');
+
+		dlLink = URL.createObjectURL(new Blob([pqBuf]));
 		loading = false;
 
-        c?.close()
+		c?.close();
 	});
 </script>
 
@@ -22,33 +43,63 @@
 	{#if loading}
 		<div class="w-full mx-auto text-center">LOADING, PLEASE WAIT...</div>
 	{/if}
-	<table class="w-full">
-		{#if result}
-			<tr
-				>{#each result.fields as th}
-					<th>{th.name} ({th.type})</th>
-				{/each}</tr
-			>
-
-			{#each result.rows as tr}
+	<div class="max-h-[400px] overflow-auto border-s-gray-100">
+		<table class="w-full">
+			{#if dataDictionary}
 				<tr
-					>{#each Object.values(tr) as val}
-						<td>
-							{val}
-						</td>
+					>{#each dataDictionary.fields as th}
+						<th>{th.name} ({th.type})</th>
 					{/each}</tr
 				>
-			{/each}
-		{/if}
-	</table>
 
-	<style>
-		table,
-		tr,
-		td,
-		th {
-			padding: 0.5rem;
-			border: solid 1px #ccc;
-		}
-	</style>
+				{#each dataDictionary.rows as tr}
+					<tr
+						>{#each Object.values(tr) as val}
+							<td>
+								{val}
+							</td>
+						{/each}</tr
+					>
+				{/each}
+			{/if}
+		</table>
+	</div>
+	<h2 class="text-3xl font-semibold leading-loose">Preview Results (limit 100)</h2>
+	{#if dlLink}
+		<a href={dlLink} download="data_preview.csv">Download Preview CSV</a>
+	{/if}
+	{#if loading}
+		<div class="w-full mx-auto text-center">LOADING, PLEASE WAIT...</div>
+	{/if}
+	<div class="max-h-[400px] overflow-auto">
+		<table class="w-full">
+			{#if queryResult}
+				<tr
+					>{#each queryResult.fields as th}
+						<th>{th.name} ({th.type})</th>
+					{/each}</tr
+				>
+
+				{#each queryResult.rows as tr}
+					<tr
+						>{#each Object.values(tr) as val}
+							<td>
+								{val}
+							</td>
+						{/each}</tr
+					>
+				{/each}
+			{/if}
+		</table>
+	</div>
 </section>
+
+<style>
+	table,
+	tr,
+	td,
+	th {
+		padding: 0.5rem;
+		border: solid 1px #ccc;
+	}
+</style>
