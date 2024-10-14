@@ -8,7 +8,7 @@ app = Flask("duckdb_query")
 @app.route("/duckdb")
 def duckdb_query():
     query = request.args.get("sql")
-
+    # fetch('localhost:5000/duckdb?query=...)
     # select * from 's3://txgio-copc-test/address_points_2024_county/*/*.parquet' WHERE County IN ('Midland', 'Upton');
     con = duckdb.connect()
     
