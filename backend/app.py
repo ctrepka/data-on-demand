@@ -5,7 +5,7 @@ import pandas as pd
 
 app = Flask("duckdb_query")
 
-@app.route("/duckdb")
+""" @app.route("/duckdb")
 def duckdb_query():
     query = request.args.get("sql")
     # fetch('localhost:5000/duckdb?query=...)
@@ -18,3 +18,11 @@ def duckdb_query():
     res = con.sql(f"{query}")
     res.show()
     return f"<p>{res}</p>"
+"""
+
+# TODO: describe table at s3 url
+# @app.route("/data_dictionary"):
+
+
+# TODO: preview data limiting to 25 results
+# @app.route("/preview"):
