@@ -11,7 +11,7 @@
 			'INSTALL spatial; LOAD spatial; INSTALL parquet; LOAD parquet;'
 		);
 		const DATA_DICT = await c?.query(
-			"DESCRIBE SELECT * FROM 's3://txgio-copc-test/stratmap24-addresspoints_48.parquet' LIMIT 1;"
+			"DESCRIBE SELECT * FROM 's3://txgio-copc-test/address_points_2024_county/*/*.parquet' LIMIT 1;"
 		);
 		const PREVIEW_TABLE = await c?.query(
 			`DROP TABLE IF EXISTS preview; CREATE TABLE preview AS SELECT * FROM 's3://txgio-copc-test/stratmap24-addresspoints_48.parquet' LIMIT 100;`

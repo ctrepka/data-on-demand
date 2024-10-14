@@ -132,3 +132,6 @@ dist
 **/.svelte-kit
 **/*.env
 **/*.zip
+
+
+**/.venv/*
